@@ -14,31 +14,3 @@ class Display:
         self.friction_c = friction
         self.gravity_direction = direction
         self.movement_speed = speed
-
-
-class Gravitron:
-    __slots__ = ['x', 'y', 'power', 'rad', 'gravity', 'sucker', 'display']
-
-    def __init__(self, cords: tuple, power: float, rad: float, display: Display):
-        self.x, self.y = cords
-        self.power = power
-        self.gravity = True
-        self.sucker = False
-        self.display = display
-        self.rad = rad
-
-    def render(self):
-        pygame.draw.circle(self.display.display, (0, 0, 0), (self.x, self.y), self.rad)
-
-
-class BlackHole(Gravitron):
-    def __init__(self, cords: tuple, power: float, rad: int, display: Display):
-        super().__init__(cords, power, rad, display)
-        self.sucker = True
-
-    def render(self):
-        pygame.draw.circle(self.display.display, (0, 0, 0), (self.x, self.y), self.rad)
-
-    def grow(self, rad):
-        self.rad += rad / 10
-        self.power += rad / 5
