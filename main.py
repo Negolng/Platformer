@@ -1,4 +1,6 @@
-from Objects import Ball, screen, dispy, fps, MainCharacter, Border, BetterGroup, Box, AI, Platform, Cursor
+from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music
+from level_contains import Platform, Box, Border
+from player_and_ai import MainCharacter
 import pygame
 
 if __name__ == '__main__':
@@ -38,8 +40,7 @@ if __name__ == '__main__':
 
     particles_group = pygame.sprite.Group()
 
-    pygame.mixer.music.load('music/Homicide.mp3')
-    pygame.mixer.music.play(-1)
+    play_music('Homicide.mp3', -1)
 
     while running:
         print(character.rect.x, character.rect.y)
@@ -88,4 +89,4 @@ if __name__ == '__main__':
             gravipipa.render()
 
         pygame.display.flip()
-        clock.tick(fps)
+        clock.tick(FPS)
