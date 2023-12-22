@@ -1,4 +1,5 @@
 from random import randint
+import sqlite3
 import pygame
 import sys
 import os
@@ -58,8 +59,8 @@ class BetterGroup(pygame.sprite.Group):
 class Cursor(pygame.sprite.Sprite):
     image = load_image('criss_cross.png')
 
-    def __init__(self, my_group, cords):
-        super().__init__(my_group)
+    def __init__(self, my_group, all_objects, cords):
+        super().__init__(my_group, all_objects)
         self.image = self.__class__.image
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = cords
@@ -78,6 +79,20 @@ def play_music(music, loops):
     pygame.mixer.music.play(loops)
 
 
+def save_game(all_objects, name):
+    pass
+    '''    connection = sqlite3.connect('saves.db')
+        cursor = connection.cursor()
+        cursor.execute(f'INSERT INTO names(name) VALUES("{name}")')
+        req = """
+        
+        """
+        for obj in all_objects:
+            pass
+        connection.commit()'''
+
+
+save_game([0], 'a')
 FPS = 120
 
 dispy = Display(screen, screensize, FPS, 0.001, 9.802, 0.1, 1, 3)

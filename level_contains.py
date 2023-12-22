@@ -20,9 +20,10 @@ class Box(pygame.sprite.Sprite):
     image = load_image('box.png')
     __slots__ = ['y_vel', 'display', 'border', 'other_sprites', 'falling']
 
-    def __init__(self, my_group: pygame.sprite.Group, x: int, y: int, display: Display,
+    def __init__(self, my_group: pygame.sprite.Group, all_objects: pygame.sprite.Group,
+                 x: int, y: int, display: Display,
                  border: pygame.sprite.Group, falling: bool = False):
-        super().__init__(my_group)
+        super().__init__(my_group, all_objects)
         self.image = self.__class__.image
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -61,5 +62,5 @@ class Particles(pygame.sprite.Sprite):
         self.cords = cords
         self.frame_c = 0
         self.particles = []
-        self.image = pygame.Surface((randint(5, 10), randint(5, 10)))
+        self.image = pygame.Surface((0, 0))
         self.rect = self.image.get_rect()

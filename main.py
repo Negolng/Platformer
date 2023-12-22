@@ -1,6 +1,6 @@
 from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music
 from level_contains import Platform, Box, Border
-from player_and_ai import MainCharacter
+from player_and_ai import MainCharacter, AI
 import pygame
 
 if __name__ == '__main__':
@@ -9,6 +9,8 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     gravipopa = []
+
+    all_objects = pygame.sprite.Group()
 
     main_sprite = BetterGroup()
 
@@ -21,16 +23,16 @@ if __name__ == '__main__':
     width, height = dispy.size
 
     mouse_g = pygame.sprite.Group()
-    cursor = Cursor(mouse_g, (0, 0))
+    cursor = Cursor(mouse_g, all_objects, (0, 0))
     pygame.mouse.set_visible(False)
 
-    character = MainCharacter(main_sprite, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
+    character = MainCharacter(main_sprite, all_objects, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
 
-    # chaser = AI(enemies, (200, 300), dispy, (vert, horiz), other_sprites, player=character)
+    chaser = AI(enemies, all_objects, (200, 300), dispy, (vert, horiz), other_sprites, player=character)
 
-    Platform(other_sprites, 450, 0, dispy, border_sprites, True)
-    Platform(other_sprites, 300, 550, dispy, border_sprites, False)
-    Box(other_sprites, 200, 350, dispy, border_sprites, True)
+    Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
+    Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
+    Box(other_sprites, all_objects, 200, 350, dispy, border_sprites, True)
 
     Border(0, height - 1, width, height - 1, border_sprites, vert, horiz)
     Border(-1, 0, -1, height, border_sprites, vert, horiz)
@@ -40,7 +42,7 @@ if __name__ == '__main__':
 
     particles_group = pygame.sprite.Group()
 
-    play_music('Homicide.mp3', -1)
+    # play_music('Business_Em.mp3', -1)
 
     while running:
         print(character.rect.x, character.rect.y)

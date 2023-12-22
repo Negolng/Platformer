@@ -7,9 +7,9 @@ class MainCharacter(pygame.sprite.Sprite):
     __slots__ = ['rect', 'display', 'y_vel', 'borders', 'jumping', 'shrinked']
     image = load_image('charly.png')
 
-    def __init__(self, my_group: pygame.sprite.Group, cords: tuple, display: Display,
+    def __init__(self, my_group: pygame.sprite.Group, all_objects: pygame.sprite.Group, cords: tuple, display: Display,
                  borders: tuple[pygame.sprite.Group, pygame.sprite.Group], other_sprites: BetterGroup):
-        super().__init__(my_group)
+        super().__init__(my_group, all_objects)
         self.image = MainCharacter.image
         self.rect = MainCharacter.image.get_rect()
         self.rect.x, self.rect.y = cords
@@ -38,7 +38,7 @@ class MainCharacter(pygame.sprite.Sprite):
         self.c += 1
         grav = True
         all_sprites = (pygame.sprite.spritecollide(self, self.other_sprites, False) +
-                       pygame.sprite.spritecollide(self, self.borders[1],False))
+                       pygame.sprite.spritecollide(self, self.borders[1], False))
         bunny = pygame.sprite.Sprite()
         bunny.rect = self.image.get_rect()
         bunny.image = self.image
@@ -117,9 +117,8 @@ class AI(MainCharacter):
         sx, sy = self.rect.x, self.rect.y
         px, py = self.player.rect.x, self.player.rect.y
         distance = (abs(sx - px)**2 + abs(sy - py))**0.5
-        if sx > px:
-            if distance > 20:
+        if distance > 20:
+            if sx > px:
                 self.move(4, 0.5)
-        elif sx < px:
-            if distance > 20:
+            elif sx < px:
                 self.move(2, 0.5)
