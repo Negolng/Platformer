@@ -28,7 +28,8 @@ if __name__ == '__main__':
 
     character = MainCharacter(main_sprite, all_objects, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
 
-    chaser = AI(enemies, all_objects, (200, 300), dispy, (vert, horiz), other_sprites, player=character)
+    chaser = AI(enemies, all_objects, (200, 300), dispy, (vert, horiz), other_sprites, player=character,
+                player_group=main_sprite)
 
     Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
     Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
@@ -72,20 +73,20 @@ if __name__ == '__main__':
                 pass
                 # Particles(particles_group, pygame.mouse.get_pos())
 
+        enemies.update(cursor)
+        enemies.draw(dispy.display)
+
         other_sprites.draw(dispy.display)
         other_sprites.update()
 
-        enemies.draw(dispy.display)
-        enemies.update(cursor)
-
-        main_sprite.draw(dispy.display)
         main_sprite.update(cursor)
+        main_sprite.draw(dispy.display)
 
         mouse_g.draw(dispy.display)
         mouse_g.update()
 
-        particles_group.draw(dispy.display)
         particles_group.update()
+        particles_group.draw(dispy.display)
 
         for gravipipa in gravipopa:
             gravipipa.render()

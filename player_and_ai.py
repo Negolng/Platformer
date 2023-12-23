@@ -4,7 +4,6 @@ import pygame
 
 
 class MainCharacter(pygame.sprite.Sprite):
-    __slots__ = ['rect', 'display', 'y_vel', 'borders', 'jumping', 'shrinked']
     image = load_image('charly.png')
 
     def __init__(self, my_group: pygame.sprite.Group, all_objects: pygame.sprite.Group, cords: tuple, display: Display,
@@ -25,17 +24,44 @@ class MainCharacter(pygame.sprite.Sprite):
         self.right = False
         self.flipped_image = pygame.transform.flip(self.image, True, False)
         self.normal_image = self.image
+        self.draw_vision = False
+        self.vision = None
 
     def update(self, cursor):
-        if cursor:
-            if cursor.rect.x > self.rect.x:
-                self.image = self.flipped_image
-                self.right = True
-            else:
-                self.image = self.normal_image
-                self.right = False
-
         self.c += 1
+        self.vision_rect()
+        self.turn_to_cursor(cursor)
+        self.gravity()  # goddamn boolshit, this func is complete crap
+
+    def move(self, direction, coeff):
+        speed = self.display.movement_speed * coeff
+
+        if direction == 4:
+            if self.right:
+                self.image = self.normal_image
+                self.mask = pygame.mask.from_surface(self.image)
+                self.right = False
+            self.rect.x -= speed
+            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
+                    for sprite in self.other_sprites]):
+                self.rect.x += speed
+
+        elif direction == 1:
+            self.rect.y -= 1
+            self.y_vel -= speed * 1.5
+
+        elif direction == 2:
+            if not self.right:
+                self.image = self.flipped_image
+                self.mask = pygame.mask.from_surface(self.image)
+                self.right = True
+            self.rect.x += speed
+
+            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
+                    for sprite in self.other_sprites]):
+                self.rect.x -= speed
+
+    def gravity(self):
         grav = True
         all_sprites = (pygame.sprite.spritecollide(self, self.other_sprites, False) +
                        pygame.sprite.spritecollide(self, self.borders[1], False))
@@ -75,50 +101,55 @@ class MainCharacter(pygame.sprite.Sprite):
             self.rect.y += self.y_vel
             self.y_vel += self.display.gravity_c / self.display.fps
 
-    def move(self, direction, coeff):
-        speed = self.display.movement_speed * coeff
-
-        if direction == 4:
-            if self.right:
-                self.image = self.normal_image
-                self.mask = pygame.mask.from_surface(self.image)
-                self.right = False
-            self.rect.x -= speed
-            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
-                    for sprite in self.other_sprites]):
-                self.rect.x += speed
-
-        elif direction == 1:
-            self.rect.y -= 1
-            self.y_vel -= speed * 1.5
-
-        elif direction == 2:
-            if not self.right:
+    def turn_to_cursor(self, cursor):
+        if cursor:
+            if cursor.rect.x > self.rect.x:
                 self.image = self.flipped_image
-                self.mask = pygame.mask.from_surface(self.image)
                 self.right = True
-            self.rect.x += speed
+            else:
+                self.image = self.normal_image
+                self.right = False
 
-            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
-                    for sprite in self.other_sprites]):
-                self.rect.x -= speed
+    def vision_rect(self):
+        g = pygame.sprite.Group()
+        sprite = pygame.sprite.Sprite(g)
+        vision_size = (250, 200)
+        pers_size = self.image.get_size()
+        sprite.image = pygame.surface.Surface((vision_size[0] + pers_size[0], vision_size[1] + pers_size[1]))
+        sprite.image.fill((0, 255, 0))
+        if self.right:
+            sprite.rect = pygame.rect.Rect((self.rect.x - pers_size[0],
+                                            self.rect.y - pers_size[1] - vision_size[1] // 2),
+                                           (vision_size[0] + pers_size[0], vision_size[1] + pers_size[1]))
+        else:
+            sprite.rect = pygame.rect.Rect((self.rect.x - vision_size[0] + pers_size[0],
+                                            self.rect.y - pers_size[1] - vision_size[1] // 2),
+                                           (vision_size[0] + pers_size[0], vision_size[1] + pers_size[1]))
+
+        if self.draw_vision:
+            g.draw(self.display.display)
+
+        self.vision = sprite
 
 
 class AI(MainCharacter):
-    def __init__(self, *args, player):
+    def __init__(self, *args, player, player_group):
         super().__init__(*args)
         self.player = player
+        self.player_group = player_group
+        self.draw_vision = True
 
     def update(self, cursor):
         MainCharacter.update(self, None)
         self.chase()
 
     def chase(self):
-        sx, sy = self.rect.x, self.rect.y
-        px, py = self.player.rect.x, self.player.rect.y
-        distance = (abs(sx - px)**2 + abs(sy - py))**0.5
-        if distance > 20:
-            if sx > px:
-                self.move(4, 0.5)
-            elif sx < px:
-                self.move(2, 0.5)
+        if self.vision and pygame.sprite.spritecollideany(self.vision, self.player_group):
+            sx, sy = self.rect.x, self.rect.y
+            px, py = self.player.rect.x, self.player.rect.y
+            distance = (abs(sx - px) ** 2 + abs(sy - py)) ** 0.5
+            if distance > 20:
+                if sx > px:
+                    self.move(4, 0.5)
+                elif sx < px:
+                    self.move(2, 0.5)
