@@ -27,15 +27,13 @@ class MainCharacter(pygame.sprite.Sprite):
 
     def update(self, cursor):
         self.c += 1
-
         self.turn_to_cursor(cursor)
         self.gravity()  # goddamn boolshit, this func is complete crap
 
     def move(self, direction, coeff):
-        speed = self.display.movement_speed * coeff
+        speed = round(self.display.movement_speed * coeff)
         if self.right:
             self.image = self.normal_image
-
         else:
             self.image = self.flipped_image
 
@@ -46,7 +44,11 @@ class MainCharacter(pygame.sprite.Sprite):
             speed = -speed
 
         if direction % 2 == 0:
-            self.rect.x -= round(speed)
+            self.rect.x -= speed
+
+            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
+                    for sprite in self.other_sprites]):
+                self.rect.x += speed
 
         else:
             self.rect.y -= 1
@@ -115,16 +117,22 @@ class AI(MainCharacter):
         self.vision_rect()
         self.chase()
 
-    def chase(self):
+    def do_we_see(self):
         if self.vision and pygame.sprite.spritecollideany(self.vision, self.player_group):
-            sx, sy = self.rect.x, self.rect.y
-            px, py = self.player.rect.x, self.player.rect.y
-            direction = 0
-            if sx > px:
-                direction = 4
-            elif sx < px:
-                direction = 2
-            self.move(direction, 0.5)
+            return True
+        # line = pygame.sprite.Sprite()
+        # line.rect = pygame.rect.Rect((self.rect.x, self.rect.y), )
+        return False
+
+    def chase(self):
+        sx, sy = self.rect.x, self.rect.y
+        px, py = self.player.rect.x, self.player.rect.y
+        direction = 0
+        if sx > px:
+            direction = 4
+        elif sx < px:
+            direction = 2
+        self.move(direction, 0.5)
 
     def vision_rect(self):
         g = pygame.sprite.Group()

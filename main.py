@@ -28,8 +28,8 @@ if __name__ == '__main__':
 
     character = MainCharacter(main_sprite, all_objects, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
 
-    chaser = AI(enemies, all_objects, (200, 300), dispy, (vert, horiz), other_sprites, player=character,
-                player_group=main_sprite)
+    AI(enemies, all_objects, (200, 300), dispy, (vert, horiz), other_sprites, player=character,
+       player_group=main_sprite)
 
     Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
     Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
@@ -44,6 +44,10 @@ if __name__ == '__main__':
     particles_group = pygame.sprite.Group()
 
     # play_music('Business_Em.mp3', -1)
+    # pygame.mixer.music.set_volume(0.1)
+    # pygame.mixer.music.set_pos(120)
+
+    movement_coeff = 1
 
     while running:
         print(character.rect.x, character.rect.y)
@@ -52,18 +56,15 @@ if __name__ == '__main__':
         keys = pygame.key.get_pressed()
         if pygame.mouse.get_focused():
             cursor.rect.x, cursor.rect.y = pygame.mouse.get_pos()
-        if keys[pygame.K_F8]:
-            pass
-            # godmod = not godmod
         if keys[pygame.K_d]:
-            character.move(2, 1)
+            character.move(2, movement_coeff)
         if keys[pygame.K_s]:
-            character.move(3, 1)
+            character.move(3, movement_coeff)
         if keys[pygame.K_a]:
-            character.move(4, 1)
+            character.move(4, movement_coeff)
         if keys[pygame.K_SPACE]:
             if not character.jumping:
-                character.move(1, 1)
+                character.move(1, movement_coeff)
                 character.jumping = True
 
         for event in pygame.event.get():
