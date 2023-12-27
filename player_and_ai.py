@@ -24,42 +24,33 @@ class MainCharacter(pygame.sprite.Sprite):
         self.right = False
         self.flipped_image = pygame.transform.flip(self.image, True, False)
         self.normal_image = self.image
-        self.draw_vision = False
-        self.vision = None
 
     def update(self, cursor):
         self.c += 1
-        self.vision_rect()
+
         self.turn_to_cursor(cursor)
         self.gravity()  # goddamn boolshit, this func is complete crap
 
     def move(self, direction, coeff):
         speed = self.display.movement_speed * coeff
+        if self.right:
+            self.image = self.normal_image
 
-        if direction == 4:
-            if self.right:
-                self.image = self.normal_image
-                self.mask = pygame.mask.from_surface(self.image)
-                self.right = False
-            self.rect.x -= speed
-            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
-                    for sprite in self.other_sprites]):
-                self.rect.x += speed
+        else:
+            self.image = self.flipped_image
 
-        elif direction == 1:
+        self.mask = pygame.mask.from_surface(self.image)
+        self.right = not self.right
+
+        if direction == 2:
+            speed = -speed
+
+        if direction % 2 == 0:
+            self.rect.x -= round(speed)
+
+        else:
             self.rect.y -= 1
             self.y_vel -= speed * 1.5
-
-        elif direction == 2:
-            if not self.right:
-                self.image = self.flipped_image
-                self.mask = pygame.mask.from_surface(self.image)
-                self.right = True
-            self.rect.x += speed
-
-            if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
-                    for sprite in self.other_sprites]):
-                self.rect.x -= speed
 
     def gravity(self):
         grav = True
@@ -110,6 +101,31 @@ class MainCharacter(pygame.sprite.Sprite):
                 self.image = self.normal_image
                 self.right = False
 
+
+class AI(MainCharacter):
+    def __init__(self, *args, player, player_group):
+        super().__init__(*args)
+        self.player = player
+        self.player_group = player_group
+        self.draw_vision = False
+        self.vision = None
+
+    def update(self, cursor):
+        super().update(None)
+        self.vision_rect()
+        self.chase()
+
+    def chase(self):
+        if self.vision and pygame.sprite.spritecollideany(self.vision, self.player_group):
+            sx, sy = self.rect.x, self.rect.y
+            px, py = self.player.rect.x, self.player.rect.y
+            direction = 0
+            if sx > px:
+                direction = 4
+            elif sx < px:
+                direction = 2
+            self.move(direction, 0.5)
+
     def vision_rect(self):
         g = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite(g)
@@ -130,26 +146,3 @@ class MainCharacter(pygame.sprite.Sprite):
             g.draw(self.display.display)
 
         self.vision = sprite
-
-
-class AI(MainCharacter):
-    def __init__(self, *args, player, player_group):
-        super().__init__(*args)
-        self.player = player
-        self.player_group = player_group
-        self.draw_vision = True
-
-    def update(self, cursor):
-        MainCharacter.update(self, None)
-        self.chase()
-
-    def chase(self):
-        if self.vision and pygame.sprite.spritecollideany(self.vision, self.player_group):
-            sx, sy = self.rect.x, self.rect.y
-            px, py = self.player.rect.x, self.player.rect.y
-            distance = (abs(sx - px) ** 2 + abs(sy - py)) ** 0.5
-            if distance > 20:
-                if sx > px:
-                    self.move(4, 0.5)
-                elif sx < px:
-                    self.move(2, 0.5)
