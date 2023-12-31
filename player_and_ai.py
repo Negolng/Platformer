@@ -32,16 +32,19 @@ class MainCharacter(pygame.sprite.Sprite):
 
     def move(self, direction, coeff):
         speed = round(self.display.movement_speed * coeff)
-        if self.right:
-            self.image = self.normal_image
-        else:
-            self.image = self.flipped_image
-
-        self.mask = pygame.mask.from_surface(self.image)
-        self.right = not self.right
-
         if direction == 2:
             speed = -speed
+            self.right = True
+        else:
+            self.right = False
+
+        if self.right:
+            self.image = self.flipped_image
+
+        else:
+            self.image = self.normal_image
+
+        self.mask = pygame.mask.from_surface(self.image)
 
         if direction % 2 == 0:
             self.rect.x -= speed
@@ -109,7 +112,7 @@ class AI(MainCharacter):
         super().__init__(*args)
         self.player = player
         self.player_group = player_group
-        self.draw_vision = False
+        self.draw_vision = True
         self.vision = None
 
     def update(self, cursor):
@@ -125,14 +128,15 @@ class AI(MainCharacter):
         return False
 
     def chase(self):
-        sx, sy = self.rect.x, self.rect.y
-        px, py = self.player.rect.x, self.player.rect.y
-        direction = 0
-        if sx > px:
-            direction = 4
-        elif sx < px:
-            direction = 2
-        self.move(direction, 0.5)
+        if self.do_we_see():
+            sx, sy = self.rect.x, self.rect.y
+            px, py = self.player.rect.x, self.player.rect.y
+            direction = 0
+            if sx > px:
+                direction = 4
+            elif sx < px:
+                direction = 2
+            self.move(direction, 0.5)
 
     def vision_rect(self):
         g = pygame.sprite.Group()
