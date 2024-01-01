@@ -1,3 +1,4 @@
+import tech
 from tech import Display, load_image, BetterGroup
 from level_contains import Border
 import pygame
@@ -13,13 +14,12 @@ class MainCharacter(pygame.sprite.Sprite):
         self.rect = MainCharacter.image.get_rect()
         self.rect.x, self.rect.y = cords
         self.y_vel = 0
-        self.x_vel = 0
+        self.x_vel = 0000
         self.display = display
         self.borders = borders
         self.other_sprites = other_sprites
         self.jumping = False
         self.mask = pygame.mask.from_surface(self.image)
-        self.shrinked = False
         self.c = 0
         self.right = False
         self.flipped_image = pygame.transform.flip(self.image, True, False)
@@ -112,7 +112,7 @@ class AI(MainCharacter):
         super().__init__(*args)
         self.player = player
         self.player_group = player_group
-        self.draw_vision = True
+        self.draw_vision = False
         self.vision = None
 
     def update(self, cursor):
@@ -123,12 +123,11 @@ class AI(MainCharacter):
     def do_we_see(self):
         if self.vision and pygame.sprite.spritecollideany(self.vision, self.player_group):
             return True
-        # line = pygame.sprite.Sprite()
-        # line.rect = pygame.rect.Rect((self.rect.x, self.rect.y), )
         return False
 
     def chase(self):
-        if self.do_we_see():
+        if (self.do_we_see() and
+                ((self.rect.x - self.player.rect.x) ** 2 + (self.rect.y - self.player.rect.y) ** 2)**0.5 > 20):
             sx, sy = self.rect.x, self.rect.y
             px, py = self.player.rect.x, self.player.rect.y
             direction = 0
@@ -136,12 +135,17 @@ class AI(MainCharacter):
                 direction = 4
             elif sx < px:
                 direction = 2
+
+            if sy > py:
+                if not self.jumping:
+                    self.move(1, 0.5)
+                    self.jumping = True
             self.move(direction, 0.5)
 
     def vision_rect(self):
         g = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite(g)
-        vision_size = (250, 200)
+        vision_size = (tech.width, 200)
         pers_size = self.image.get_size()
         sprite.image = pygame.surface.Surface((vision_size[0] + pers_size[0], vision_size[1] + pers_size[1]))
         sprite.image.fill((0, 255, 0))
@@ -158,3 +162,35 @@ class AI(MainCharacter):
             g.draw(self.display.display)
 
         self.vision = sprite
+
+    def vision_line(self):
+        g = pygame.sprite.Group()
+        sprite = pygame.sprite.Sprite(g)
+        xsiz = self.rect.x - self.player.rect.x
+        ysiz = self.rect.y - self.player.rect.y
+
+        sprite.image = pygame.surface.Surface((abs(xsiz), abs(ysiz) + 1))
+        sprite.rect = self.rect.copy()
+        sprite.rect.y -= 1
+        if ysiz > 0:
+            sprite.rect.y -= abs(ysiz)
+
+        if xsiz > 0:
+            sprite.rect.x -= abs(xsiz)
+
+        # sprite.image.set_colorkey((0, 0, 0))
+        sprite.image = sprite.image.convert_alpha()
+        pygame.draw.line(sprite.image, (255, 0, 0), (0, 0),
+                         (sprite.image.get_size()[0], sprite.image.get_size()[1] - 1), 1)
+
+        if (ysiz > 0 > xsiz) or (ysiz < 0 < xsiz):
+            sprite.image = pygame.transform.flip(sprite.image, True, False)
+
+        # sprite.mask = pygame.mask.from_surface(sprite.image)
+        if self.draw_vision:
+            g.draw(self.display.display)
+        if any([pygame.sprite.collide_mask(self, sprite) for sprite in self.other_sprites]):
+            print(([sprite for sprite in self.other_sprites if pygame.sprite.collide_mask(self, sprite)]))
+            return False
+
+        return True
