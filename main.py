@@ -27,9 +27,7 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
 
     character = MainCharacter(main_sprite, all_objects, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
-
-    AI(enemies, all_objects, (200, 300), dispy, (vert, horiz), other_sprites, player=character,
-       player_group=main_sprite)
+    character.jumping = True
 
     Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
     Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
@@ -50,7 +48,7 @@ if __name__ == '__main__':
     movement_coeff = 1
 
     while running:
-        print(character.rect.x, character.rect.y)
+        # print(character.rect.x, character.rect.y)
         screen.fill((255, 255, 255))
 
         keys = pygame.key.get_pressed()
@@ -67,12 +65,17 @@ if __name__ == '__main__':
                 character.move(1, movement_coeff)
                 character.jumping = True
 
+        if pygame.mouse.get_pressed()[0]:
+            character.fire()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
-                # Particles(particles_group, pygame.mouse.get_pos())
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[2]:
+                    AI(main_sprite, all_objects, pygame.mouse.get_pos(), dispy, (vert, horiz), other_sprites,
+                       player=character,
+                       player_group=main_sprite)
 
         enemies.update(cursor)
         enemies.draw(dispy.display)
@@ -80,8 +83,8 @@ if __name__ == '__main__':
         other_sprites.draw(dispy.display)
         other_sprites.update()
 
-        main_sprite.update(cursor)
         main_sprite.draw(dispy.display)
+        main_sprite.update(cursor)
 
         mouse_g.draw(dispy.display)
         mouse_g.update()

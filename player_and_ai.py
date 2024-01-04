@@ -1,5 +1,7 @@
 import tech
+import sys
 from tech import Display, load_image, BetterGroup
+from weapons import Guns
 from level_contains import Border
 import pygame
 
@@ -14,7 +16,7 @@ class MainCharacter(pygame.sprite.Sprite):
         self.rect = MainCharacter.image.get_rect()
         self.rect.x, self.rect.y = cords
         self.y_vel = 0
-        self.x_vel = 0000
+        self.x_vel = 0
         self.display = display
         self.borders = borders
         self.other_sprites = other_sprites
@@ -24,11 +26,15 @@ class MainCharacter(pygame.sprite.Sprite):
         self.right = False
         self.flipped_image = pygame.transform.flip(self.image, True, False)
         self.normal_image = self.image
+        self.gun = pygame.sprite.Group()
+        Guns.AK47(self.gun, all_objects, self, 10, 10, 10, 10)
 
     def update(self, cursor):
         self.c += 1
         self.turn_to_cursor(cursor)
         self.gravity()  # goddamn boolshit, this func is complete crap
+        self.gun.update()
+        self.gun.draw(self.display.display)
 
     def move(self, direction, coeff):
         speed = round(self.display.movement_speed * coeff)
@@ -40,9 +46,13 @@ class MainCharacter(pygame.sprite.Sprite):
 
         if self.right:
             self.image = self.flipped_image
+            if self.gun.sprites():
+                self.gun.sprites()[0].image = self.gun.sprites()[0].flipped_image
 
         else:
             self.image = self.normal_image
+            if self.gun.sprites():
+                self.gun.sprites()[0].image = self.gun.sprites()[0].normal_image
 
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -101,10 +111,21 @@ class MainCharacter(pygame.sprite.Sprite):
         if cursor:
             if cursor.rect.x > self.rect.x:
                 self.image = self.flipped_image
+                self.gun.sprites()[0].image = self.gun.sprites()[0].normal_image
                 self.right = True
             else:
                 self.image = self.normal_image
+                self.gun.sprites()[0].image = self.gun.sprites()[0].flipped_image
+
                 self.right = False
+
+    def kill(self):
+        pygame.sprite.Sprite.kill(self)
+        pygame.sprite.Sprite.kill(self.gun.sprites()[0])
+
+    def fire(self):
+        if self.gun.sprites():
+            self.gun.sprites()[0].fire(*pygame.mouse.get_pos(), *self.rect.center)
 
 
 class AI(MainCharacter):
@@ -114,11 +135,18 @@ class AI(MainCharacter):
         self.player_group = player_group
         self.draw_vision = False
         self.vision = None
+        self.hp = 10
+        self.gun = pygame.sprite.Group()
+        Guns.EnemyGun(self.gun, args[1], self, 10, 10, 10, 10)
 
     def update(self, cursor):
+        if self.hp <= 0:
+            self.kill()
         super().update(None)
         self.vision_rect()
         self.chase()
+        if self.do_we_see():
+            self.murder()
 
     def do_we_see(self):
         if self.vision and pygame.sprite.spritecollideany(self.vision, self.player_group):
@@ -194,3 +222,7 @@ class AI(MainCharacter):
             return False
 
         return True
+
+    def murder(self):
+        if self.gun.sprites():
+            self.gun.sprites()[0].fire(*self.player.rect.center, *self.rect.center)

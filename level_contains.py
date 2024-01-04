@@ -34,11 +34,18 @@ class Box(pygame.sprite.Sprite):
         self.other_sprites = pygame.sprite.Group()
         self.falling = falling
         self.mask = pygame.mask.from_surface(self.image)
+        self.hp = 100
+        self.dc = 0
+        self.dead = False
+
         for sprite in my_group:
             if sprite != self:
                 self.other_sprites.add(sprite)
 
     def update(self):
+        if self.hp <= 0:
+            self.kill()
+
         if self.falling:
             self.rect.y += self.y_vel
             self.y_vel += self.display.gravity_c / self.display.fps
