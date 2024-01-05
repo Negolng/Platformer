@@ -93,16 +93,17 @@ class Gun(pygame.sprite.Sprite):
         self.bullets.update()
         self.bullets.draw(tech.dispy.display)
 
-    def fire(self, target_x, target_y, sender_x, sender_y):
+    def fire(self, target_x, target_y, sender_x, sender_y, number_of_bullets=1):
         if self.c / tech.FPS > self.cooldown:
-            xx = (math.log2((random.random() + 1) * self.aim**2))
-            yy = (math.log2((random.random() + 1) * self.aim**2))
-            xv = ((target_x - sender_x) / tech.FPS) * xx
-            yv = ((target_y - sender_y) / tech.FPS) * yy
-            mult = math.sqrt(self.bullet_vel / (xv ** 2 + yv ** 2))
-            speed = (xv * mult, yv * mult)
-            Bullet(self.bullets, self.all_objects, self.owner.rect.center, self.owner, self.bullet_size, speed)
-            self.c = 1
+            for _ in range(number_of_bullets):
+                xx = (math.log2((random.random() + 1) * self.aim**2))
+                yy = (math.log2((random.random() + 1) * self.aim**2))
+                xv = ((target_x - sender_x) / tech.FPS) * xx
+                yv = ((target_y - sender_y) / tech.FPS) * yy
+                mult = math.sqrt(self.bullet_vel / (xv ** 2 + yv ** 2))
+                speed = (xv * mult, yv * mult)
+                Bullet(self.bullets, self.all_objects, self.owner.rect.center, self.owner, self.bullet_size, speed)
+                self.c = 1
 
 
 class Guns:
@@ -112,7 +113,7 @@ class Guns:
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.bullet_vel = 30
-            self.cooldown = 0.05
+            self.cooldown = 0.1
             self.aim = 3
             self.bullet_size = 4
 

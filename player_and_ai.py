@@ -96,7 +96,11 @@ class MainCharacter(pygame.sprite.Sprite):
                         elif sy > oy:
                             bunny.rect.y += 1
                         else:
-                            bunny.rect.y = -100
+                            self.jumping = True
+                            if sx > ox:
+                                bunny.rect.x += 1
+                            else:
+                                bunny.rect.x -= 1
                     else:
                         bunny.rect.y -= 1
 
@@ -138,6 +142,8 @@ class AI(MainCharacter):
         self.hp = 10
         self.gun = pygame.sprite.Group()
         Guns.EnemyGun(self.gun, args[1], self, 10, 10, 10, 10)
+        self.peaceful = False
+        self.all_sprites = args[1]
 
     def update(self, cursor):
         if self.hp <= 0:
@@ -145,7 +151,7 @@ class AI(MainCharacter):
         super().update(None)
         self.vision_rect()
         self.chase()
-        if self.do_we_see():
+        if self.do_we_see() and not self.peaceful:
             self.murder()
 
     def do_we_see(self):
@@ -192,6 +198,7 @@ class AI(MainCharacter):
         self.vision = sprite
 
     def vision_line(self):
+        # Too much lag!!!!
         g = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite(g)
         xsiz = self.rect.x - self.player.rect.x
@@ -206,7 +213,7 @@ class AI(MainCharacter):
         if xsiz > 0:
             sprite.rect.x -= abs(xsiz)
 
-        # sprite.image.set_colorkey((0, 0, 0))
+        sprite.image.set_colorkey((0, 0, 0))
         sprite.image = sprite.image.convert_alpha()
         pygame.draw.line(sprite.image, (255, 0, 0), (0, 0),
                          (sprite.image.get_size()[0], sprite.image.get_size()[1] - 1), 1)
@@ -214,11 +221,17 @@ class AI(MainCharacter):
         if (ysiz > 0 > xsiz) or (ysiz < 0 < xsiz):
             sprite.image = pygame.transform.flip(sprite.image, True, False)
 
-        # sprite.mask = pygame.mask.from_surface(sprite.image)
+        sprite.mask = pygame.mask.from_surface(sprite.image)
         if self.draw_vision:
             g.draw(self.display.display)
-        if any([pygame.sprite.collide_mask(self, sprite) for sprite in self.other_sprites]):
+
+        # print(pygame.sprite.spritecollideany(self, self.all_sprites))
+        print(self.all_sprites.sprites())
+
+        if any([pygame.sprite.collide_mask(self, sprite) for sprite in self.other_sprites if
+                not pygame.sprite.collide_mask(self, sprite)]):
             print(([sprite for sprite in self.other_sprites if pygame.sprite.collide_mask(self, sprite)]))
+
             return False
 
         return True

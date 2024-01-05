@@ -29,9 +29,9 @@ if __name__ == '__main__':
     character = MainCharacter(main_sprite, all_objects, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
     character.jumping = True
 
-    Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
-    Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
-    Box(other_sprites, all_objects, 200, 350, dispy, border_sprites, True)
+    # Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
+    # Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
+    # Box(other_sprites, all_objects, 200, 350, dispy, border_sprites, True)
 
     Border(0, height - 1, width, height - 1, border_sprites, vert, horiz)
     Border(-1, 0, -1, height, border_sprites, vert, horiz)
@@ -77,14 +77,17 @@ if __name__ == '__main__':
                        player=character,
                        player_group=main_sprite)
 
+                elif pygame.mouse.get_pressed()[1]:
+                    Platform(other_sprites, all_objects, *pygame.mouse.get_pos(), dispy, border_sprites, False)
+
         enemies.update(cursor)
         enemies.draw(dispy.display)
 
         other_sprites.draw(dispy.display)
         other_sprites.update()
 
-        main_sprite.draw(dispy.display)
         main_sprite.update(cursor)
+        main_sprite.draw(dispy.display)
 
         mouse_g.draw(dispy.display)
         mouse_g.update()

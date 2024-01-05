@@ -55,6 +55,15 @@ class BetterGroup(pygame.sprite.Group):
             elif direction == 4:
                 sprite.rect.x += speed
 
+    def draw(
+        self, surface, bgsurf=None, special_flags=0
+    ):
+        for sprite in self.sprites():
+            surface.blit(sprite.image, sprite.rect)
+
+            if hasattr(sprite, 'gun'):
+                sprite.gun.draw(surface)
+
 
 class Cursor(pygame.sprite.Sprite):
     image = load_image('criss_cross.png')
@@ -79,20 +88,6 @@ def play_music(music, loops):
     pygame.mixer.music.play(loops)
 
 
-def save_game(all_objects, name):
-    pass
-    '''    connection = sqlite3.connect('saves.db')
-        cursor = connection.cursor()
-        cursor.execute(f'INSERT INTO names(name) VALUES("{name}")')
-        req = """
-        
-        """
-        for obj in all_objects:
-            pass
-        connection.commit()'''
-
-
-save_game([0], 'a')
 FPS = 120
 
 dispy = Display(screen, screensize, FPS, 0.001, 9.802, 0.1, 1, 3)
