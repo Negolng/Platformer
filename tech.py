@@ -1,5 +1,5 @@
-from random import randint
-import sqlite3
+import math
+from random import randint, choice
 import pygame
 import sys
 import os
@@ -76,7 +76,7 @@ class Cursor(pygame.sprite.Sprite):
 
 
 def rand_pos():
-    return tuple((randint(0, width), randint(0, height)))
+    return tuple((randint(0, width - 30), randint(0, height - 30)))
 
 
 def rand_col():
@@ -91,3 +91,17 @@ def play_music(music, loops):
 FPS = 120
 
 dispy = Display(screen, screensize, FPS, 0.001, 9.802, 0.1, 1, 3)
+
+
+def generate_level(necessary_objects, level_contains, number):
+
+    other_sprites, all_objects, border_sprites = necessary_objects
+    bools = (True, False)
+    number_of_boxes = randint(1, 50) * round(math.log10(number**2))
+    for _ in range(number_of_boxes):
+        if choice(bools):
+            level_contains.Box(other_sprites, all_objects, *rand_pos(), dispy, border_sprites, True)
+        else:
+            level_contains.Platform(other_sprites, all_objects, *rand_pos(), dispy, border_sprites, True)
+
+

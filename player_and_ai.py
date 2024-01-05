@@ -149,9 +149,9 @@ class AI(MainCharacter):
         if self.hp <= 0:
             self.kill()
         super().update(None)
-        self.vision_rect()
+        # self.vision_rect()
         self.chase()
-        if self.do_we_see() and not self.peaceful:
+        if not self.peaceful:
             self.murder()
 
     def do_we_see(self):
@@ -160,8 +160,7 @@ class AI(MainCharacter):
         return False
 
     def chase(self):
-        if (self.do_we_see() and
-                ((self.rect.x - self.player.rect.x) ** 2 + (self.rect.y - self.player.rect.y) ** 2)**0.5 > 20):
+        if ((self.rect.x - self.player.rect.x) ** 2 + (self.rect.y - self.player.rect.y) ** 2)**0.5 > 20:
             sx, sy = self.rect.x, self.rect.y
             px, py = self.player.rect.x, self.player.rect.y
             direction = 0

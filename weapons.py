@@ -45,9 +45,8 @@ class Bullet(pygame.sprite.Sprite):
         for sprite in collided:
             if sprite != self and not isinstance(sprite, tech.Cursor) and not isinstance(sprite, Gun):
                 if not isinstance(sprite, Bullet):
-                    if sprite == self.sender:
-                        if self.c / tech.FPS < 0.5:
-                            return None
+                    if sprite == self.sender or isinstance(sprite, player_and_ai.AI):
+                        return None
                     if isinstance(sprite, player_and_ai.AI) or isinstance(sprite, level_contains.Box):
                         sprite.hp -= 1
                         self.kill()

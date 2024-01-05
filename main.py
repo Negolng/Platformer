@@ -1,5 +1,6 @@
-from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music
+from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music, generate_level
 from level_contains import Platform, Box, Border
+import level_contains
 from player_and_ai import MainCharacter, AI
 import pygame
 
@@ -7,8 +8,6 @@ if __name__ == '__main__':
     running = True
 
     clock = pygame.time.Clock()
-
-    gravipopa = []
 
     all_objects = pygame.sprite.Group()
 
@@ -46,6 +45,7 @@ if __name__ == '__main__':
     # pygame.mixer.music.set_pos(120)
 
     movement_coeff = 1
+    generate_level((other_sprites, all_objects, border_sprites), level_contains, 100)
 
     while running:
         # print(character.rect.x, character.rect.y)
@@ -94,9 +94,6 @@ if __name__ == '__main__':
 
         particles_group.update()
         particles_group.draw(dispy.display)
-
-        for gravipipa in gravipopa:
-            gravipipa.render()
 
         pygame.display.flip()
         clock.tick(FPS)
