@@ -5,6 +5,7 @@ import sys
 import os
 
 pygame.init()
+pygame.font.init()
 width, height = screensize = (900, 600)
 screen = pygame.display.set_mode(screensize)
 
@@ -97,7 +98,7 @@ def generate_level(necessary_objects, level_contains, player_and_ai, dick, playe
 
     other_sprites, all_objects, border_sprites = necessary_objects
     bools = (True, False)
-    number_of_boxes = randint(1, 50) * round(math.log10(number**2)) + 2
+    number_of_boxes = randint(1, 50) * round(math.log10(number**2 + 1)) + 2
     for _ in range(number_of_boxes):
         y = randint(120, height)
         x = randint(0, width // 2 - 35) if choice(bools) else randint(width // 2 + 35, width - 30)
@@ -116,3 +117,17 @@ def generate_level(necessary_objects, level_contains, player_and_ai, dick, playe
                          player_group=player_group)
 
 
+def starting_screen():
+    disp = pygame.display.set_mode(screensize)
+    font_of_death = pygame.font.SysFont('Papyrus', 50)
+    surrealism = font_of_death.render('To start press SPACE', False, (255, 255, 255))
+    start_screen = True
+    while start_screen:
+        start_screen = not pygame.key.get_pressed()[pygame.K_SPACE]
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start_screen = False
+
+        disp.fill((0, 0, 0))
+        disp.blit(surrealism, (0, 0))
+        pygame.display.flip()

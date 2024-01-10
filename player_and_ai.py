@@ -128,7 +128,8 @@ class MainCharacter(pygame.sprite.Sprite):
                 self.right = False
 
     def kill(self):
-        print("DEAD")
+        if type(self) == MainCharacter:
+            print("DEAD")
         pygame.sprite.Sprite.kill(self)
         pygame.sprite.Sprite.kill(self.gun.sprites()[0])
 

@@ -27,7 +27,6 @@ class Bullet(pygame.sprite.Sprite):
         self.actual_x, self.actual_y = self.actual_x + self.speed[0], self.actual_y + self.speed[1]
         self.rect.x, self.rect.y = self.actual_x, self.actual_y
         self.destroy()
-        self.bullet_gravity()
         if self.is_outside():
             if self.bounce:
                 if 0 < self.rect.y < tech.height:
@@ -36,9 +35,6 @@ class Bullet(pygame.sprite.Sprite):
                     self.speed = [self.speed[0], -self.speed[1]]
             else:
                 self.kill()
-
-    def bullet_gravity(self):
-        self.speed[1] += tech.dispy.gravity_c / tech.FPS**2
 
     def destroy(self):
         collided = pygame.sprite.spritecollide(self, self.all_objects, False)
@@ -100,7 +96,7 @@ class Gun(pygame.sprite.Sprite):
                 xv = ((target_x - sender_x) / tech.FPS) * xx
                 yv = ((target_y - sender_y) / tech.FPS) * yy
                 if xv != 0 and yv != 0:
-                    mult = math.sqrt(self.bullet_vel / (xv ** 2 + yv ** 2))
+                    mult = math.sqrt(self.bullet_vel**2 / (xv**2 + yv**2))
                 else:
                     mult = 1
                 speed = (xv * mult, yv * mult)

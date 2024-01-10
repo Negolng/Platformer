@@ -1,4 +1,4 @@
-from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music, generate_level
+from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music, generate_level, starting_screen
 from level_contains import Platform, Box, Border
 import level_contains
 import player_and_ai
@@ -6,6 +6,7 @@ from player_and_ai import MainCharacter, AI
 import pygame
 
 if __name__ == '__main__':
+    starting_screen()
     running = True
 
     clock = pygame.time.Clock()
@@ -27,8 +28,14 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
 
     character = MainCharacter(main_sprite, all_objects, (width // 2, 50), dispy, (vert, horiz), other_sprites)
-    Platform(other_sprites, all_objects, character.rect.x, character.rect.y + 35, dispy, border_sprites, False).hp\
-        = 10000
+
+    svp = Platform(other_sprites, all_objects, character.rect.x - 50, character.rect.y + 35, dispy, border_sprites,
+                   False)
+    svp.hp = 2**2**10
+    image = pygame.transform.scale(svp.image, (svp.rect.width * 2, svp.rect.height))
+    svp.change_image(image)
+    sbw = Box(other_sprites, all_objects, character.rect.x - 75, character.rect.y + 35, dispy, border_sprites,
+                   True)
 
     character.jumping = True
 
@@ -46,7 +53,7 @@ if __name__ == '__main__':
 
     movement_coeff = 1
 
-    level = 10
+    level = 0
     generate_level((other_sprites, all_objects, border_sprites), level_contains, player_and_ai, (vert, horiz),
                    character, main_sprite, enemies,
                    level)

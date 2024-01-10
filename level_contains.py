@@ -58,6 +58,13 @@ class Box(pygame.sprite.Sprite):
         return (pygame.sprite.spritecollideany(self, self.border) or
                 pygame.sprite.spritecollideany(self, self.other_sprites))
 
+    def change_image(self, image: pygame.surface.Surface):
+        self.image = image
+        self.mask = pygame.mask.from_surface(self.image)
+        x, y = self.rect.x, self.rect.y
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = x, y
+
 
 class Platform(Box):
     image = load_image('platform.png')
