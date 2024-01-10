@@ -93,15 +93,26 @@ FPS = 120
 dispy = Display(screen, screensize, FPS, 0.001, 9.802, 0.1, 1, 3)
 
 
-def generate_level(necessary_objects, level_contains, number):
+def generate_level(necessary_objects, level_contains, player_and_ai, dick, player, player_group, ai_group, number):
 
     other_sprites, all_objects, border_sprites = necessary_objects
     bools = (True, False)
-    number_of_boxes = randint(1, 50) * round(math.log10(number**2))
+    number_of_boxes = randint(1, 50) * round(math.log10(number**2)) + 2
     for _ in range(number_of_boxes):
+        y = randint(120, height)
+        x = randint(0, width // 2 - 35) if choice(bools) else randint(width // 2 + 35, width - 30)
         if choice(bools):
-            level_contains.Box(other_sprites, all_objects, *rand_pos(), dispy, border_sprites, True)
+            level_contains.Box(other_sprites, all_objects, x, y, dispy, border_sprites, True)
         else:
-            level_contains.Platform(other_sprites, all_objects, *rand_pos(), dispy, border_sprites, True)
+            level_contains.Platform(other_sprites, all_objects, x, y, dispy, border_sprites, True)
+
+    for _ in range(FPS * 5):
+        other_sprites.update()
+
+    for _ in range(number):
+        y = randint(120, height)
+        x = randint(0, width // 2 - 35) if choice(bools) else randint(width // 2 + 35, width - 30)
+        player_and_ai.AI(ai_group, all_objects, (x, y), dispy, dick, other_sprites, player=player,
+                         player_group=player_group)
 
 

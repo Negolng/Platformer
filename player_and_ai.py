@@ -1,5 +1,7 @@
+import random
+
 import tech
-import sys
+import math
 from tech import Display, load_image, BetterGroup
 from weapons import Guns
 from level_contains import Border
@@ -57,6 +59,8 @@ class MainCharacter(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
         if direction % 2 == 0:
+            # a = math.log(10, 1 + random.random() * 10000)
+            # print(a)
             self.rect.x -= speed
 
             if any([pygame.sprite.collide_mask(self, sprite) and self.rect.y > sprite.rect.y
@@ -124,6 +128,7 @@ class MainCharacter(pygame.sprite.Sprite):
                 self.right = False
 
     def kill(self):
+        print("DEAD")
         pygame.sprite.Sprite.kill(self)
         pygame.sprite.Sprite.kill(self.gun.sprites()[0])
 

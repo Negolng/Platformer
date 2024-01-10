@@ -1,6 +1,7 @@
 from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music, generate_level
 from level_contains import Platform, Box, Border
 import level_contains
+import player_and_ai
 from player_and_ai import MainCharacter, AI
 import pygame
 
@@ -25,12 +26,11 @@ if __name__ == '__main__':
     cursor = Cursor(mouse_g, all_objects, (0, 0))
     pygame.mouse.set_visible(False)
 
-    character = MainCharacter(main_sprite, all_objects, (width // 2, height // 2), dispy, (vert, horiz), other_sprites)
-    character.jumping = True
+    character = MainCharacter(main_sprite, all_objects, (width // 2, 50), dispy, (vert, horiz), other_sprites)
+    Platform(other_sprites, all_objects, character.rect.x, character.rect.y + 35, dispy, border_sprites, False).hp\
+        = 10000
 
-    # Platform(other_sprites, all_objects, 450, 0, dispy, border_sprites, True)
-    # Platform(other_sprites, all_objects, 300, 550, dispy, border_sprites, False)
-    # Box(other_sprites, all_objects, 200, 350, dispy, border_sprites, True)
+    character.jumping = True
 
     Border(0, height - 1, width, height - 1, border_sprites, vert, horiz)
     Border(-1, 0, -1, height, border_sprites, vert, horiz)
@@ -45,8 +45,11 @@ if __name__ == '__main__':
     # pygame.mixer.music.set_pos(120)
 
     movement_coeff = 1
-    generate_level((other_sprites, all_objects, border_sprites), level_contains, 100)
 
+    level = 10
+    generate_level((other_sprites, all_objects, border_sprites), level_contains, player_and_ai, (vert, horiz),
+                   character, main_sprite, enemies,
+                   level)
     while running:
         # print(character.rect.x, character.rect.y)
         screen.fill((255, 255, 255))
@@ -73,9 +76,10 @@ if __name__ == '__main__':
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[2]:
-                    AI(main_sprite, all_objects, pygame.mouse.get_pos(), dispy, (vert, horiz), other_sprites,
-                       player=character,
-                       player_group=main_sprite)
+                    for i in range(10):
+                        AI(enemies, all_objects, pygame.mouse.get_pos(), dispy, (vert, horiz), other_sprites,
+                           player=character,
+                           player_group=main_sprite)
 
                 elif pygame.mouse.get_pressed()[1]:
                     Platform(other_sprites, all_objects, *pygame.mouse.get_pos(), dispy, border_sprites, False)
@@ -94,6 +98,14 @@ if __name__ == '__main__':
 
         particles_group.update()
         particles_group.draw(dispy.display)
+
+        if not enemies.sprites():
+            level += 1
+            generate_level((other_sprites, all_objects, border_sprites), level_contains, player_and_ai, (vert, horiz),
+                           character, main_sprite, enemies,
+                           level)
+
+        # print(clock.get_fps())
 
         pygame.display.flip()
         clock.tick(FPS)

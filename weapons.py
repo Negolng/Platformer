@@ -45,7 +45,7 @@ class Bullet(pygame.sprite.Sprite):
         for sprite in collided:
             if sprite != self and not isinstance(sprite, tech.Cursor) and not isinstance(sprite, Gun):
                 if not isinstance(sprite, Bullet):
-                    if sprite == self.sender or isinstance(sprite, player_and_ai.AI):
+                    if sprite == self.sender:
                         return None
                     if isinstance(sprite, player_and_ai.AI) or isinstance(sprite, level_contains.Box):
                         sprite.hp -= 1
@@ -99,7 +99,10 @@ class Gun(pygame.sprite.Sprite):
                 yy = (math.log2((random.random() + 1) * self.aim**2))
                 xv = ((target_x - sender_x) / tech.FPS) * xx
                 yv = ((target_y - sender_y) / tech.FPS) * yy
-                mult = math.sqrt(self.bullet_vel / (xv ** 2 + yv ** 2))
+                if xv != 0 and yv != 0:
+                    mult = math.sqrt(self.bullet_vel / (xv ** 2 + yv ** 2))
+                else:
+                    mult = 1
                 speed = (xv * mult, yv * mult)
                 Bullet(self.bullets, self.all_objects, self.owner.rect.center, self.owner, self.bullet_size, speed)
                 self.c = 1
