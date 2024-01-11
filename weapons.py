@@ -100,7 +100,10 @@ class Gun(pygame.sprite.Sprite):
                 else:
                     mult = 1
                 speed = (xv * mult, yv * mult)
-                Bullet(self.bullets, self.all_objects, self.owner.rect.center, self.owner, self.bullet_size, speed)
+                cords = (self.owner.rect.center[0] +
+                         random.randint(-self.aim, self.aim), self.owner.rect.center[1] +
+                         random.randint(-self.aim, self.aim))
+                Bullet(self.bullets, self.all_objects, cords, self.owner, self.bullet_size, speed)
                 self.c = 1
 
 
@@ -110,7 +113,7 @@ class Guns:
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.bullet_vel = 30
+            self.bullet_vel = 15
             self.cooldown = 0.1
             self.aim = 3
             self.bullet_size = 4
@@ -120,7 +123,18 @@ class Guns:
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.bullet_vel = 10
+            self.bullet_vel = 5
             self.cooldown = 0.2
             self.aim = 1
             self.bullet_size = 5
+
+    class MachineGun(Gun):
+        image = load_image("gun.png")
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.bullet_vel = 10
+            self.cooldown = 0.001
+            self.aim = 2
+            self.bullet_size = 3
+

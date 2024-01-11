@@ -1,13 +1,17 @@
 import math
 from random import randint, choice
+import datetime
 import pygame
 import sys
 import os
+
 
 pygame.init()
 pygame.font.init()
 width, height = screensize = (900, 600)
 screen = pygame.display.set_mode(screensize)
+SCORE = 0
+level = 1
 
 
 def load_image(name, colorkey=None):
@@ -84,11 +88,6 @@ def rand_col():
     return tuple((randint(0, 255), randint(0, 255), randint(0, 255)))
 
 
-def play_music(music, loops):
-    pygame.mixer.music.load(os.path.join('music', music))
-    pygame.mixer.music.play(loops)
-
-
 FPS = 120
 
 dispy = Display(screen, screensize, FPS, 0.001, 9.802, 0.1, 1, 3)
@@ -126,8 +125,109 @@ def starting_screen():
         start_screen = not pygame.key.get_pressed()[pygame.K_SPACE]
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                sys.exit()
+
+        disp.fill((0, 0, 0))
+        disp.blit(surrealism, (width // 2 - surrealism.get_width() // 2, 0))
+        pygame.display.flip()
+    logger('Game started')
+
+
+def ending_screen():
+    disp = pygame.display.set_mode(screensize)
+    font_of_death = pygame.font.SysFont('Papyrus', 40)
+    surrealism = font_of_death.render('YOU  ARE  DEAD', False, (255, 255, 255))
+    imfunny = font_of_death.render('(haha lol)', False, (255, 255, 255))
+    score = font_of_death.render(f'SCORE: {int(SCORE // 1 + 1)}', False, (255, 255, 255))
+    levle = font_of_death.render(f'LEVEL: {level}', False, (255, 255, 255))
+    helpp = font_of_death.render('(To quit press esc)', False, (255, 255, 255))
+    start_screen = True
+    while start_screen:
+        start_screen = not pygame.key.get_pressed()[pygame.K_ESCAPE]
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 start_screen = False
 
         disp.fill((0, 0, 0))
-        disp.blit(surrealism, (0, 0))
+        disp.blit(surrealism, (width // 2 - surrealism.get_width() // 2, 0))
+        disp.blit(imfunny, (width // 2 - imfunny.get_width() // 2, 50))
+        disp.blit(score, (width // 2 - score.get_width() // 2, 100))
+        disp.blit(levle, (width // 2 - levle.get_width() // 2, 150))
+        disp.blit(helpp, (width // 2 - helpp.get_width() // 2, 350))
         pygame.display.flip()
+    logger('Game ended')
+    sys.exit()
+
+
+class RunningCircle(pygame.sprite.Sprite):
+    def __init__(self, group, cords):
+        super().__init__(group)
+        self.size = 50
+        self.image = pygame.Surface((self.size, self.size))
+        pygame.draw.circle(self.image, (255, 255, 255), (self.size // 2, self.size // 2), self.size // 2)
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = cords
+        self.actual_x, self.actual_y = self.rect.centerx, self.rect.centery
+        self.speed = [120, 120]
+
+    def update(self, *args, **kwargs):
+        self.actual_x += self.speed[0] / FPS
+        self.actual_y += self.speed[1] / FPS
+        self.rect.centerx, self.rect.centery = self.actual_x, self.actual_y
+        self.decide_and_bounce()
+
+    def decide_and_bounce(self):
+        if self.actual_x - self.size // 2 < 0 or self.actual_x + self.size // 2 > width:
+            self.bounce_wall()
+        if self.actual_y - self.size // 2 < 0 or self.actual_y + self.size // 2 > height:
+            self.bounce_ceiling()
+        self.speed = [self.speed[0], self.speed[1]]
+
+    def bounce_wall(self):
+        self.speed[0] = -self.speed[0]
+
+    def bounce_ceiling(self):
+        self.speed[1] = -self.speed[1]
+
+
+def middle_screen(player):
+    disp = pygame.display.set_mode(screensize)
+    pygame.mouse.set_visible(True)
+    if player:
+        player.rect.x, player.rect.y = (width // 2, 50)
+    font_of_death = pygame.font.SysFont('Papyrus', 50)
+    surrealism = font_of_death.render(f'Congratulations, you completed level {level}', False, (255, 255, 255))
+    ababa = font_of_death.render(f'Click the circle to continue', False, (255, 255, 255))
+    start_screen = True
+
+    circl = pygame.sprite.Group()
+    sprit = RunningCircle(circl, (width // 2, height // 2))
+
+    mous = pygame.sprite.Sprite()
+    mous.image = pygame.Surface((1, 1))
+    mous.rect = mous.image.get_rect()
+    while start_screen:
+        mous.rect.x, mous.rect.y = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+        if pygame.mouse.get_pressed()[0] and pygame.sprite.spritecollideany(mous, circl):
+            start_screen = False
+        sprit.rect.x += sprit.speed[0] / FPS
+        sprit.rect.y += sprit.speed[1] / FPS
+
+        disp.fill((0, 0, 0))
+        disp.blit(surrealism, (width // 2 - surrealism.get_width() // 2, 0))
+        disp.blit(ababa, (width // 2 - ababa.get_width() // 2, 100))
+
+        circl.draw(disp)
+        circl.update()
+
+        pygame.display.flip()
+    pygame.mouse.set_visible(False)
+
+
+def logger(log_message):
+    with open('log.txt', 'a') as file:
+        file.write(f'{log_message} | [{datetime.datetime.now()}]\n')
+    file.close()

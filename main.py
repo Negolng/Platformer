@@ -1,9 +1,10 @@
-from tech import dispy, BetterGroup, Cursor, FPS, screen, play_music, generate_level, starting_screen
+from tech import dispy, BetterGroup, Cursor, FPS, screen, generate_level, starting_screen
 from level_contains import Platform, Box, Border
 import level_contains
 import player_and_ai
 from player_and_ai import MainCharacter, AI
 import pygame
+import tech
 
 if __name__ == '__main__':
     starting_screen()
@@ -34,8 +35,6 @@ if __name__ == '__main__':
     svp.hp = 2**2**10
     image = pygame.transform.scale(svp.image, (svp.rect.width * 2, svp.rect.height))
     svp.change_image(image)
-    sbw = Box(other_sprites, all_objects, character.rect.x - 75, character.rect.y + 35, dispy, border_sprites,
-                   True)
 
     character.jumping = True
 
@@ -47,16 +46,12 @@ if __name__ == '__main__':
 
     particles_group = pygame.sprite.Group()
 
-    # play_music('Business_Em.mp3', -1)
-    # pygame.mixer.music.set_volume(0.1)
-    # pygame.mixer.music.set_pos(120)
-
     movement_coeff = 1
+    font_of_score = pygame.font.SysFont('8-bit', 30)
 
-    level = 0
     generate_level((other_sprites, all_objects, border_sprites), level_contains, player_and_ai, (vert, horiz),
                    character, main_sprite, enemies,
-                   level)
+                   tech.level)
     while running:
         # print(character.rect.x, character.rect.y)
         screen.fill((255, 255, 255))
@@ -106,13 +101,22 @@ if __name__ == '__main__':
         particles_group.update()
         particles_group.draw(dispy.display)
 
-        if not enemies.sprites():
-            level += 1
+        if not enemies.sprites() and tech.level > 0:
+            tech.middle_screen(character)
+            tech.level += 1
             generate_level((other_sprites, all_objects, border_sprites), level_contains, player_and_ai, (vert, horiz),
                            character, main_sprite, enemies,
-                           level)
+                           tech.level)
 
-        # print(clock.get_fps())
+        font_suffer = font_of_score.render("SCORE: " + str(int(tech.SCORE // 1 + 1)), True, (0, 0, 0))
+        dispy.display.blit(font_suffer, (0, 0))
+
+        font_surfer = font_of_score.render("FPS: " + str(int(round(clock.get_fps()))), True, (0, 0, 0))
+        dispy.display.blit(font_surfer, (0, 30))
+
+        font_surfer = font_of_score.render("LEVEL: " + str(tech.level), True, (0, 0, 0))
+        dispy.display.blit(font_surfer, (0, 60))
 
         pygame.display.flip()
         clock.tick(FPS)
+        tech.SCORE += 10 / FPS

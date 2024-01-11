@@ -1,7 +1,4 @@
-import random
-
 import tech
-import math
 from tech import Display, load_image, BetterGroup
 from weapons import Guns
 from level_contains import Border
@@ -29,7 +26,7 @@ class MainCharacter(pygame.sprite.Sprite):
         self.flipped_image = pygame.transform.flip(self.image, True, False)
         self.normal_image = self.image
         self.gun = pygame.sprite.Group()
-        Guns.AK47(self.gun, all_objects, self, 10, 10, 10, 10)
+        Guns.MachineGun(self.gun, all_objects, self, 10, 10, 10, 10)
 
     def update(self, cursor):
         self.c += 1
@@ -128,14 +125,19 @@ class MainCharacter(pygame.sprite.Sprite):
                 self.right = False
 
     def kill(self):
-        if type(self) == MainCharacter:
-            print("DEAD")
+        if type(self) is MainCharacter:
+            tech.ending_screen()
+
+        elif self is AI:
+            tech.SCORE += 100
+            tech.logger('AI killed')
+            tech.logger('player received 100 points')
         pygame.sprite.Sprite.kill(self)
         pygame.sprite.Sprite.kill(self.gun.sprites()[0])
 
     def fire(self):
         if self.gun.sprites():
-            self.gun.sprites()[0].fire(*pygame.mouse.get_pos(), *self.rect.center)
+            self.gun.sprites()[0].fire(*pygame.mouse.get_pos(), *self.rect.center, 5)
 
 
 class AI(MainCharacter):

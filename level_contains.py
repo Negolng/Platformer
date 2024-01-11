@@ -1,6 +1,6 @@
 from tech import load_image, Display
-from random import randint
 import pygame
+import tech
 
 
 class Border(pygame.sprite.Sprite):
@@ -64,6 +64,12 @@ class Box(pygame.sprite.Sprite):
         x, y = self.rect.x, self.rect.y
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
+
+    def kill(self):
+        tech.SCORE += 50
+        tech.logger(f'A {self.__class__.__name__} died T_T')
+        tech.logger('Player received 50 points')
+        super().kill()
 
 
 class Platform(Box):
