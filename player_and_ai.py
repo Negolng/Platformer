@@ -126,6 +126,7 @@ class MainCharacter(pygame.sprite.Sprite):
 
     def kill(self):
         if type(self) is MainCharacter:
+            tech.logger('Player died')
             tech.ending_screen()
 
         elif self is AI:
