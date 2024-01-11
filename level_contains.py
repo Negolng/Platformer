@@ -35,6 +35,7 @@ class Box(pygame.sprite.Sprite):
         self.falling = falling
         self.mask = pygame.mask.from_surface(self.image)
         self.hp = 100
+        self.start_hp = 100
         self.dc = 0
         self.dead = False
 
@@ -53,6 +54,8 @@ class Box(pygame.sprite.Sprite):
             while self._collides_with_border_or_sprites():
                 self.rect.y -= 1
                 self.y_vel = 0
+        if self.hp < self.start_hp // 2:
+            self.image = load_image(f'cracked_{self.__class__.__name__}.png')
 
     def _collides_with_border_or_sprites(self):
         return (pygame.sprite.spritecollideany(self, self.border) or
