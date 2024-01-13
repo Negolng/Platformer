@@ -1,5 +1,5 @@
 from tech import dispy, BetterGroup, Cursor, FPS, screen, generate_level, starting_screen
-from level_contains import Platform, Box, Border
+from level_contains import Platform, Border
 import level_contains
 import player_and_ai
 from player_and_ai import MainCharacter, AI
