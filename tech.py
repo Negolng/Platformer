@@ -211,8 +211,8 @@ def middle_screen(player):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-        if pygame.mouse.get_pressed()[0] and pygame.sprite.spritecollideany(mous, circl):
-            start_screen = False
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.sprite.spritecollideany(mous, circl):
+                start_screen = False
         sprit.rect.x += sprit.speed[0] / FPS
         sprit.rect.y += sprit.speed[1] / FPS
 
