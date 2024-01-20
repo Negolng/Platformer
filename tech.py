@@ -34,7 +34,7 @@ class Display:
     __slots__ = ['display', 'size', 'fps', 'air_loss', 'gravity_c', 'friction_c', 'gravity_direction', 'movement_speed']
 
     def __init__(self, display: pygame.display, size: tuple, frps: int, loss: float, gravitation: float,
-                 friction: float, direction: int, speed: float | int):
+                 friction: float, direction: int, speed):
         self.display = display
         self.size = size
         self.fps = frps
